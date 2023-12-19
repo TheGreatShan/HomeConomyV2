@@ -1,4 +1,4 @@
-CREATE DATABASE IF NOT EXISTS `homeconomy`;
+ConCREATE DATABASE IF NOT EXISTS `homeconomy`;
 USE `homeconomy`;
 
 CREATE TABLE IF NOT EXISTS `users`
