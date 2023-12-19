@@ -5,6 +5,6 @@ import (
 	"net/http"
 )
 
-func GetVersion(c *gin.Context)  {
+func GetVersion(c *gin.Context) {
 	c.IndentedJSON(http.StatusOK, "v1.0")
 }

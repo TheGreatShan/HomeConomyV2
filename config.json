@@ -1,0 +1,7 @@
+{
+    "Host": "192.168.1.116",
+    "Port": "3306",
+    "Database": "homeconomy",
+    "Username": "root",
+    "Password": "root"
+}
