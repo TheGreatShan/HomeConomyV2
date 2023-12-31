@@ -38,3 +38,29 @@ func GetCompanies(c *gin.Context) {
 
 	c.IndentedJSON(http.StatusOK, companies)
 }
+
+func GetCompany(c *gin.Context) {
+	var company Company
+
+	connection, err := services.GetDbConnection(c)
+
+	if err != nil {
+		panic(err)
+	}
+	id, err := hex.DecodeString(c.Param("id"))
+
+	if err != nil {
+		panic(err)
+	}
+	query, err := connection.Query("SELECT * FROM companies WHERE id = ?", id)
+
+	defer query.Close()
+	for query.Next() {
+		if err := query.Scan(&company.Id, &company.Name); err != nil {
+			panic(err)
+		}
+		company = Company{Id: hex.EncodeToString([]byte(company.Id)), Name: company.Name}
+	}
+
+	c.IndentedJSON(http.StatusOK, company)
+}
