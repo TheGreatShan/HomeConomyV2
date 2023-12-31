@@ -1,10 +1,12 @@
 package main
 
 import (
+	"HomeConomyv2GO/company"
 	"HomeConomyv2GO/handlers"
 	"HomeConomyv2GO/version"
 	"database/sql"
 	"fmt"
+
 	"github.com/gin-gonic/gin"
 	_ "github.com/go-sql-driver/mysql"
 )
@@ -42,6 +44,7 @@ func main() {
 
 	router.Use(ApiMiddleware(database.Db))
 	router.GET("/version", version.GetVersion)
+	router.GET("/companies", company.GetCompanies)
 
 	router.Run("localhost:8080")
 }
