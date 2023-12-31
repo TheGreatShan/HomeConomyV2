@@ -55,12 +55,13 @@ func GetCompany(c *gin.Context) {
 	query, err := connection.Query("SELECT * FROM companies WHERE id = ?", id)
 
 	defer query.Close()
-	for query.Next() {
+	if query.Next() {
 		if err := query.Scan(&company.Id, &company.Name); err != nil {
 			panic(err)
 		}
 		company = Company{Id: hex.EncodeToString([]byte(company.Id)), Name: company.Name}
+		c.IndentedJSON(http.StatusOK, company)
+	} else {
+		c.IndentedJSON(http.StatusNotFound, gin.H{"Message": "company not found"})
 	}
-
-	c.IndentedJSON(http.StatusOK, company)
 }
