@@ -65,3 +65,23 @@ func GetCompany(c *gin.Context) {
 		c.IndentedJSON(http.StatusNotFound, gin.H{"Message": "company not found"})
 	}
 }
+
+func CreateCompany(c *gin.Context) {
+	var company Company
+
+	connection, err := services.GetDbConnection(c)
+
+	if err != nil {
+		panic(err)
+	}
+
+	if err := c.ShouldBindJSON(&company); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"Error": err.Error()})
+		return
+	}
+	id, err := hex.DecodeString(services.CreateUuid())
+	company.Id = hex.EncodeToString(id)
+	connection.Query("INSERT INTO companies (id, name) VALUES (?, ?)", id, company.Name)
+
+	c.IndentedJSON(http.StatusCreated, company)
+}

@@ -44,8 +44,10 @@ func main() {
 
 	router.Use(ApiMiddleware(database.Db))
 	router.GET("/version", version.GetVersion)
+
 	router.GET("/companies", company.GetCompanies)
 	router.GET("/companies/:id", company.GetCompany)
+	router.POST("/companies", company.CreateCompany)
 
 	router.Run("localhost:8080")
 }
