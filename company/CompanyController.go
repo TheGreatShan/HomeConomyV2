@@ -85,3 +85,26 @@ func CreateCompany(c *gin.Context) {
 
 	c.IndentedJSON(http.StatusCreated, company)
 }
+
+func UpdateCompany(c *gin.Context) {
+	var company Company
+
+	connection, err := services.GetDbConnection(c)
+
+	if err != nil {
+		panic(err)
+	}
+
+	if err := c.ShouldBindJSON(&company); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"Error": err.Error()})
+		return
+	}
+	id, err := hex.DecodeString(c.Param("id"))
+
+	if err != nil {
+		panic(err)
+	}
+	connection.Query("UPDATE companies SET name = ? WHERE id = ?", company.Name, id)
+
+	c.IndentedJSON(http.StatusCreated, company)
+}
