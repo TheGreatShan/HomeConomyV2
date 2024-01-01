@@ -18,22 +18,10 @@ func GetCompanies(c *gin.Context) {
 	var companies []Company
 
 	connection, err := services.GetDbConnection(c)
-
 	handlers.Panic(err)
 
-	query, err := connection.Query("SELECT * FROM companies")
-
+	companies, err = GetAllCompanies(connection)
 	handlers.Panic(err)
-
-	defer query.Close()
-	for query.Next() {
-		var company Company
-		if err := query.Scan(&company.Id, &company.Name); err != nil {
-			panic(err)
-		}
-		company = Company{Id: hex.EncodeToString([]byte(company.Id)), Name: company.Name}
-		companies = append(companies, company)
-	}
 
 	c.IndentedJSON(http.StatusOK, companies)
 }
@@ -46,21 +34,18 @@ func GetCompany(c *gin.Context) {
 	handlers.Panic(err)
 
 	id, err := hex.DecodeString(c.Param("id"))
-
 	handlers.Panic(err)
 
-	query, err := connection.Query("SELECT * FROM companies WHERE id = ?", id)
-
-	defer query.Close()
-	if query.Next() {
-		if err := query.Scan(&company.Id, &company.Name); err != nil {
-			panic(err)
-		}
-		company = Company{Id: hex.EncodeToString([]byte(company.Id)), Name: company.Name}
-		c.IndentedJSON(http.StatusOK, company)
-	} else {
+	exists := handlers.CheckIfExistsById(c, "companies")
+	if exists == false {
 		c.IndentedJSON(http.StatusNotFound, gin.H{"Message": "company not found"})
+		return
 	}
+
+	company, err = GetCompanyById(connection, id)
+	handlers.Panic(err)
+
+	c.IndentedJSON(http.StatusOK, company)
 }
 
 func CreateCompany(c *gin.Context) {
@@ -81,12 +66,10 @@ func CreateCompany(c *gin.Context) {
 		c.IndentedJSON(http.StatusConflict, gin.H{"Message": "company already exists"})
 		return
 	}
-	
-	id, err := hex.DecodeString(services.CreateUuid())
-	company.Id = hex.EncodeToString(id)
-	connection.Query("INSERT INTO companies (id, name) VALUES (?, ?)", id, company.Name)
 
-	c.IndentedJSON(http.StatusCreated, company)
+	createdCompany, err := CreateNewCompany(connection, company)
+	handlers.Panic(err)
+	c.IndentedJSON(http.StatusCreated, createdCompany)
 }
 
 func UpdateCompany(c *gin.Context) {
@@ -111,7 +94,8 @@ func UpdateCompany(c *gin.Context) {
 
 	handlers.Panic(err)
 
-	connection.Query("UPDATE companies SET name = ? WHERE id = ?", company.Name, id)
+	company, err = UpdateCompanyById(connection, id, company)
+	handlers.Panic(err)
 
 	c.IndentedJSON(http.StatusCreated, company)
 }
@@ -132,7 +116,8 @@ func DeleteCompany(c *gin.Context) {
 		return
 	}
 
-	connection.Query("DELETE FROM companies WHERE id = ?", id)
-
+	err = DeleteCompanyById(connection, id)
+	handlers.Panic(err)
+	
 	c.IndentedJSON(http.StatusNoContent, gin.H{})
 }
