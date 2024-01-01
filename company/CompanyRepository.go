@@ -25,3 +25,24 @@ func GetAllCompanies(connection *sql.DB) ([]Company, error) {
 	}
 	return companies, nil
 }
+
+func GetCompanyById(connection *sql.DB, id []byte) (Company, error) {
+	var company Company
+
+	query, err := connection.Query("SELECT * FROM companies WHERE id = ?", id)
+
+	if err != nil {
+		return company, err
+	}
+
+	defer query.Close()
+
+	if query.Next() {
+		if err := query.Scan(&company.Id, &company.Name); err != nil {
+			return company, err
+		}
+		company = Company{Id: hex.EncodeToString([]byte(company.Id)), Name: company.Name}
+	}
+
+	return company, nil
+}

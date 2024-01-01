@@ -34,21 +34,17 @@ func GetCompany(c *gin.Context) {
 	handlers.Panic(err)
 
 	id, err := hex.DecodeString(c.Param("id"))
-
 	handlers.Panic(err)
 
-	query, err := connection.Query("SELECT * FROM companies WHERE id = ?", id)
-
-	defer query.Close()
-	if query.Next() {
-		if err := query.Scan(&company.Id, &company.Name); err != nil {
-			panic(err)
-		}
-		company = Company{Id: hex.EncodeToString([]byte(company.Id)), Name: company.Name}
-		c.IndentedJSON(http.StatusOK, company)
-	} else {
+	exists := handlers.CheckIfExistsById(c, "companies")
+	if exists == false {
 		c.IndentedJSON(http.StatusNotFound, gin.H{"Message": "company not found"})
+		return
 	}
+	company, err = GetCompanyById(connection, id)
+	handlers.Panic(err)
+
+	c.IndentedJSON(http.StatusOK, company)
 }
 
 func CreateCompany(c *gin.Context) {
