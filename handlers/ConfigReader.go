@@ -16,17 +16,13 @@ type DbConfig struct {
 func GetDbConfig(path string) DbConfig {
 	file, err := os.ReadFile(path)
 
-	if err != nil {
-		panic(err)
-	}
+	Panic(err)
 
 	var db DbConfig
 
 	err = json.Unmarshal(file, &db)
 
-	if err != nil {
-		panic(err)
-	}
+	Panic(err)
 
 	return db
 }

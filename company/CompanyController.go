@@ -19,14 +19,12 @@ func GetCompanies(c *gin.Context) {
 
 	connection, err := services.GetDbConnection(c)
 
-	if err != nil {
-		panic(err)
-	}
+	handlers.Panic(err)
 
 	query, err := connection.Query("SELECT * FROM companies")
-	if err != nil {
-		panic("laksdj")
-	}
+
+	handlers.Panic(err)
+
 	defer query.Close()
 	for query.Next() {
 		var company Company
@@ -45,14 +43,12 @@ func GetCompany(c *gin.Context) {
 
 	connection, err := services.GetDbConnection(c)
 
-	if err != nil {
-		panic(err)
-	}
+	handlers.Panic(err)
+
 	id, err := hex.DecodeString(c.Param("id"))
 
-	if err != nil {
-		panic(err)
-	}
+	handlers.Panic(err)
+
 	query, err := connection.Query("SELECT * FROM companies WHERE id = ?", id)
 
 	defer query.Close()
@@ -72,9 +68,7 @@ func CreateCompany(c *gin.Context) {
 
 	connection, err := services.GetDbConnection(c)
 
-	if err != nil {
-		panic(err)
-	}
+	handlers.Panic(err)
 
 	if err := c.ShouldBindJSON(&company); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"Error": err.Error()})
@@ -100,9 +94,7 @@ func UpdateCompany(c *gin.Context) {
 
 	connection, err := services.GetDbConnection(c)
 
-	if err != nil {
-		panic(err)
-	}
+	handlers.Panic(err)
 
 	result := handlers.CheckIfExistsById(c, "companies")
 
@@ -117,9 +109,8 @@ func UpdateCompany(c *gin.Context) {
 	}
 	id, err := hex.DecodeString(c.Param("id"))
 
-	if err != nil {
-		panic(err)
-	}
+	handlers.Panic(err)
+
 	connection.Query("UPDATE companies SET name = ? WHERE id = ?", company.Name, id)
 
 	c.IndentedJSON(http.StatusCreated, company)
@@ -128,14 +119,11 @@ func UpdateCompany(c *gin.Context) {
 func DeleteCompany(c *gin.Context) {
 	connection, err := services.GetDbConnection(c)
 
-	if err != nil {
-		panic(err)
-	}
+	handlers.Panic(err)
+
 	id, err := hex.DecodeString(c.Param("id"))
 
-	if err != nil {
-		panic(err)
-	}
+	handlers.Panic(err)
 
 	result := handlers.CheckIfExistsById(c, "companies")
 
