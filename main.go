@@ -49,6 +49,7 @@ func main() {
 	router.GET("/companies/:id", company.GetCompany)
 	router.POST("/companies", company.CreateCompany)
 	router.PUT("/companies/:id", company.UpdateCompany)
+	router.DELETE("/companies/:id", company.DeleteCompany)
 
 	router.Run("localhost:8080")
 }

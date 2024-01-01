@@ -108,3 +108,19 @@ func UpdateCompany(c *gin.Context) {
 
 	c.IndentedJSON(http.StatusCreated, company)
 }
+
+func DeleteCompany(c *gin.Context) {
+	connection, err := services.GetDbConnection(c)
+
+	if err != nil {
+		panic(err)
+	}
+	id, err := hex.DecodeString(c.Param("id"))
+
+	if err != nil {
+		panic(err)
+	}
+	connection.Query("DELETE FROM companies WHERE id = ?", id)
+
+	c.IndentedJSON(http.StatusNoContent, gin.H{})
+}
