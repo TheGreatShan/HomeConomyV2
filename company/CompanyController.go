@@ -80,6 +80,14 @@ func CreateCompany(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"Error": err.Error()})
 		return
 	}
+
+	result := handlers.CheckIfExistsByName(c, "companies", company.Name)
+
+	if result == true {
+		c.IndentedJSON(http.StatusConflict, gin.H{"Message": "company already exists"})
+		return
+	}
+	
 	id, err := hex.DecodeString(services.CreateUuid())
 	company.Id = hex.EncodeToString(id)
 	connection.Query("INSERT INTO companies (id, name) VALUES (?, ?)", id, company.Name)
