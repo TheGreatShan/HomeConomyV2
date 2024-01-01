@@ -18,22 +18,10 @@ func GetCompanies(c *gin.Context) {
 	var companies []Company
 
 	connection, err := services.GetDbConnection(c)
-
 	handlers.Panic(err)
 
-	query, err := connection.Query("SELECT * FROM companies")
-
+	companies, err = GetAllCompanies(connection)
 	handlers.Panic(err)
-
-	defer query.Close()
-	for query.Next() {
-		var company Company
-		if err := query.Scan(&company.Id, &company.Name); err != nil {
-			panic(err)
-		}
-		company = Company{Id: hex.EncodeToString([]byte(company.Id)), Name: company.Name}
-		companies = append(companies, company)
-	}
 
 	c.IndentedJSON(http.StatusOK, companies)
 }
@@ -81,7 +69,7 @@ func CreateCompany(c *gin.Context) {
 		c.IndentedJSON(http.StatusConflict, gin.H{"Message": "company already exists"})
 		return
 	}
-	
+
 	id, err := hex.DecodeString(services.CreateUuid())
 	company.Id = hex.EncodeToString(id)
 	connection.Query("INSERT INTO companies (id, name) VALUES (?, ?)", id, company.Name)
