@@ -96,6 +96,13 @@ func UpdateCompany(c *gin.Context) {
 		panic(err)
 	}
 
+	result := handlers.CheckIfExistsById(c, "companies")
+
+	if result == false {
+		c.IndentedJSON(http.StatusNotFound, gin.H{"Message": "company not found"})
+		return
+	}
+
 	if err := c.ShouldBindJSON(&company); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"Error": err.Error()})
 		return
