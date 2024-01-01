@@ -72,3 +72,13 @@ func UpdateCompanyById(connection *sql.DB, id []byte, company Company) (Company,
 	defer result.Close()
 	return company, nil
 }
+
+func DeleteCompanyById(connection *sql.DB, id []byte) error {
+	result, err := connection.Query("DELETE FROM companies WHERE id = ?", id)
+	if err != nil {
+		return err
+	}
+
+	defer result.Close()
+	return nil
+}

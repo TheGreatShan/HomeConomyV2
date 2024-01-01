@@ -116,7 +116,8 @@ func DeleteCompany(c *gin.Context) {
 		return
 	}
 
-	connection.Query("DELETE FROM companies WHERE id = ?", id)
-
+	err = DeleteCompanyById(connection, id)
+	handlers.Panic(err)
+	
 	c.IndentedJSON(http.StatusNoContent, gin.H{})
 }
