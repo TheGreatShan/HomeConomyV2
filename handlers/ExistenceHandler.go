@@ -10,18 +10,13 @@ import (
 func CheckIfExistsById(c *gin.Context, table string) bool {
 	connection, err := services.GetDbConnection(c)
 
-	if err != nil {
-		panic(err)
-	}
+	Panic(err)
+
 	id, err := hex.DecodeString(c.Param("id"))
-	if err != nil {
-		panic(err)
-	}
+	Panic(err)
 	item, err := connection.Query("SELECT * FROM "+table+" WHERE id = ?", id)
 
-	if err != nil {
-		panic(err)
-	}
+	Panic(err)
 
 	if item.Next() {
 		return true
@@ -33,17 +28,11 @@ func CheckIfExistsById(c *gin.Context, table string) bool {
 func CheckIfExistsByName(c *gin.Context, table string, name string) bool {
 	connection, err := services.GetDbConnection(c)
 
-	if err != nil {
-		panic(err)
-	}
-	if err != nil {
-		panic(err)
-	}
+	Panic(err)
+
 	item, err := connection.Query("SELECT * FROM "+table+" WHERE name = ?", name)
 
-	if err != nil {
-		panic(err)
-	}
+	Panic(err)
 
 	if item.Next() {
 		return true
