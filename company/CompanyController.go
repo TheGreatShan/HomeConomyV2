@@ -41,6 +41,7 @@ func GetCompany(c *gin.Context) {
 		c.IndentedJSON(http.StatusNotFound, gin.H{"Message": "company not found"})
 		return
 	}
+
 	company, err = GetCompanyById(connection, id)
 	handlers.Panic(err)
 
@@ -66,11 +67,10 @@ func CreateCompany(c *gin.Context) {
 		return
 	}
 
-	id, err := hex.DecodeString(services.CreateUuid())
-	company.Id = hex.EncodeToString(id)
-	connection.Query("INSERT INTO companies (id, name) VALUES (?, ?)", id, company.Name)
-
-	c.IndentedJSON(http.StatusCreated, company)
+	
+	createdCompany, err := CreateNewCompany(connection, company)
+	handlers.Panic(err)
+	c.IndentedJSON(http.StatusCreated, createdCompany)
 }
 
 func UpdateCompany(c *gin.Context) {
