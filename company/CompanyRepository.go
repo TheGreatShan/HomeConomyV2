@@ -62,3 +62,13 @@ func CreateNewCompany(connection *sql.DB, company Company) (Company, error) {
 
 	return company, nil
 }
+
+func UpdateCompanyById(connection *sql.DB, id []byte, company Company) (Company, error) {
+	result, err := connection.Query("UPDATE companies SET name = ? WHERE id = ?", company.Name, id)
+	if err != nil {
+		return company, err
+	}
+
+	defer result.Close()
+	return company, nil
+}

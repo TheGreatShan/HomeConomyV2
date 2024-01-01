@@ -67,7 +67,6 @@ func CreateCompany(c *gin.Context) {
 		return
 	}
 
-	
 	createdCompany, err := CreateNewCompany(connection, company)
 	handlers.Panic(err)
 	c.IndentedJSON(http.StatusCreated, createdCompany)
@@ -95,7 +94,8 @@ func UpdateCompany(c *gin.Context) {
 
 	handlers.Panic(err)
 
-	connection.Query("UPDATE companies SET name = ? WHERE id = ?", company.Name, id)
+	company, err = UpdateCompanyById(connection, id, company)
+	handlers.Panic(err)
 
 	c.IndentedJSON(http.StatusCreated, company)
 }
