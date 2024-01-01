@@ -1,6 +1,7 @@
 package company
 
 import (
+	"HomeConomyv2GO/handlers"
 	"HomeConomyv2GO/services"
 	"encoding/hex"
 	"net/http"
@@ -79,6 +80,14 @@ func CreateCompany(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"Error": err.Error()})
 		return
 	}
+
+	result := handlers.CheckIfExistsByName(c, "companies", company.Name)
+
+	if result == true {
+		c.IndentedJSON(http.StatusConflict, gin.H{"Message": "company already exists"})
+		return
+	}
+	
 	id, err := hex.DecodeString(services.CreateUuid())
 	company.Id = hex.EncodeToString(id)
 	connection.Query("INSERT INTO companies (id, name) VALUES (?, ?)", id, company.Name)
@@ -93,6 +102,13 @@ func UpdateCompany(c *gin.Context) {
 
 	if err != nil {
 		panic(err)
+	}
+
+	result := handlers.CheckIfExistsById(c, "companies")
+
+	if result == false {
+		c.IndentedJSON(http.StatusNotFound, gin.H{"Message": "company not found"})
+		return
 	}
 
 	if err := c.ShouldBindJSON(&company); err != nil {
@@ -121,38 +137,14 @@ func DeleteCompany(c *gin.Context) {
 		panic(err)
 	}
 
-	result := CheckIfCompanyExistsById(c)
+	result := handlers.CheckIfExistsById(c, "companies")
 
 	if result == false {
 		c.IndentedJSON(http.StatusNotFound, gin.H{"Message": "company not found"})
 		return
-	} 
+	}
 
 	connection.Query("DELETE FROM companies WHERE id = ?", id)
 
 	c.IndentedJSON(http.StatusNoContent, gin.H{})
-}
-
-func CheckIfCompanyExistsById(c *gin.Context) bool {
-	connection, err := services.GetDbConnection(c)
-
-	if err != nil {
-		panic(err)
-	}
-	id, err := hex.DecodeString(c.Param("id"))
-	if err != nil {
-		panic(err)
-	}
-
-	item, err := connection.Query("SELECT * FROM companies WHERE id = ?", id)
-
-	if err != nil {
-		panic(err)
-	}
-
-	if item.Next() {
-		return true
-	} else {
-		return false
-	}
 }
