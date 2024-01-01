@@ -14,12 +14,12 @@ func TestGetDbConfig(t *testing.T) {
 		if err != nil {
 			t.Fatalf("Cannot create temporary file: %v", err)
 		}
-		
+
 		defer os.Remove(temp.Name())
-		
+
 		dbConfig := handlers.DbConfig{
-			Host: "value",
-			Port: "123",
+			Host:     "value",
+			Port:     "123",
 			Database: "value",
 			Username: "value",
 			Password: "value",
@@ -29,11 +29,11 @@ func TestGetDbConfig(t *testing.T) {
 		if err != nil {
 			t.Fatalf("Cannot marshal DbConfig: %v", err)
 		}
-		
+
 		os.WriteFile(temp.Name(), marshal, 0644)
-		
+
 		result := handlers.GetDbConfig(temp.Name())
-		
+
 		if !reflect.DeepEqual(dbConfig, result) {
 			t.Errorf("Expected %+v, got %+v", dbConfig, result)
 		}
