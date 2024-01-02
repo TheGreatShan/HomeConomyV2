@@ -3,6 +3,7 @@ package main
 import (
 	"HomeConomyv2GO/company"
 	"HomeConomyv2GO/handlers"
+	"HomeConomyv2GO/users"
 	"HomeConomyv2GO/version"
 	"database/sql"
 	"fmt"
@@ -50,6 +51,8 @@ func main() {
 	router.POST("/companies", company.CreateCompany)
 	router.PUT("/companies/:id", company.UpdateCompany)
 	router.DELETE("/companies/:id", company.DeleteCompany)
+	
+	router.POST("/users", users.CreateUser)
 
 	router.Run("localhost:8080")
 }
